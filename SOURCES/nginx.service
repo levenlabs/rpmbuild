@@ -1,0 +1,19 @@
+# Based on the Nginx spec from Fedora which is available
+# under the MIT license: http://opensource.org/licenses/BSD-2-Clause
+# http://pkgs.fedoraproject.org/cgit/nginx.git/plain/nginx.service?id=6ab709a7ebcff2542444e8fdabb9b733f1ed436c
+
+[Unit]
+Description=The nginx HTTP and reverse proxy server
+After=syslog.target network.target remote-fs.target nss-lookup.target
+
+[Service]
+Type=forking
+PIDFile=/var/run/nginx.pid
+ExecStartPre=/usr/sbin/nginx -t
+ExecStart=/usr/sbin/nginx
+ExecReload=/bin/kill -s HUP $MAINPID
+ExecStop=/bin/kill -s QUIT $MAINPID
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
