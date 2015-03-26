@@ -30,9 +30,11 @@ BuildRequires: pcre-devel
 BuildRequires: openssl-devel
 BuildRequires: perl
 BuildRequires: GeoIP-devel
-Requires: initscripts >= 8.36
 Requires: luajit >= 2.0.2
 Requires: openssl >= 1.0.1
+Requires: zlib
+Requires: pcre
+Requires: GeoIP
 Requires(pre): shadow-utils
 Provides: webserver
 
