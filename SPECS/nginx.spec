@@ -6,7 +6,7 @@
 Summary: nginx is a high performance web server
 Name: nginx
 Version: 1.7.10
-Release: 0%{?dist}
+Release: 1%{?dist}
 Vendor: nginx inc.
 URL: http://nginx.org/
 
@@ -17,7 +17,7 @@ Source3: https://github.com/openresty/echo-nginx-module/archive/v0.57/echo-nginx
 Source4: https://github.com/openresty/headers-more-nginx-module/archive/v0.25/headers-more-nginx-module-0.25.tar.gz
 Source5: https://github.com/openresty/lua-nginx-module/archive/v0.9.15/lua-nginx-module-0.9.15.tar.gz
 Source6: https://github.com/simpl/ngx_devel_kit/archive/v0.2.19/ngx_devel_kit-0.2.19.tar.gz
-Source7: https://github.com/arut/nginx-rtmp-module/archive/v1.1.6/nginx-rtmp-module-1.1.6.tar.gz
+Source7: https://github.com/arut/nginx-rtmp-module/archive/v1.1.7/nginx-rtmp-module-1.1.7.tar.gz
 Source8: nginx-default.conf
 Source9: nginx.service
 
@@ -87,11 +87,12 @@ tar xf %{SOURCE7} -C $RPM_BUILD_DIR
     --with-file-aio \
     --with-ipv6 \
     --with-cc-opt="%{optflags} $(pcre-config --cflags)" \
+    --with-debug \
     --add-module=$RPM_BUILD_DIR/echo-nginx-module-0.57 \
     --add-module=$RPM_BUILD_DIR/headers-more-nginx-module-0.25 \
     --add-module=$RPM_BUILD_DIR/lua-nginx-module-0.9.15 \
     --add-module=$RPM_BUILD_DIR/ngx_devel_kit-0.2.19 \
-    --add-module=$RPM_BUILD_DIR/nginx-rtmp-module-1.1.6
+    --add-module=$RPM_BUILD_DIR/nginx-rtmp-module-1.1.7
 
 make %{?_smp_mflags}
 
