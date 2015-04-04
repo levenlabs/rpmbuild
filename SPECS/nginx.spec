@@ -6,7 +6,7 @@
 Summary: nginx is a high performance web server
 Name: nginx
 Version: 1.7.10
-Release: 1%{?dist}
+Release: 2%{?dist}
 Vendor: nginx inc.
 URL: http://nginx.org/
 
@@ -145,8 +145,8 @@ make %{?_smp_mflags}
 %{_datadir}/nginx/html/*
 %{_unitdir}/nginx.service
 
-%attr(0755,root,root) %dir %{_localstatedir}/cache/nginx
-%attr(0755,root,root) %dir %{_localstatedir}/log/nginx
+%attr(0755,nginx,nginx) %dir %{_localstatedir}/cache/nginx
+%attr(0755,nginx,nginx) %dir %{_localstatedir}/log/nginx
 
 %pre
 # Add the "nginx" user
