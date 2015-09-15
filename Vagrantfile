@@ -7,7 +7,7 @@ Vagrant.configure(2) do |config|
   # please see the online documentation at vagrantup.com.
 
   # Every Vagrant virtual environment requires a box to build off of.
-  config.vm.box = "chef/centos-7.0"
+  config.vm.box = "jayunit100/centos7"
 
   # Disable automatic box update checking. If you disable this, then
   # boxes will only be checked for updates when the user runs
