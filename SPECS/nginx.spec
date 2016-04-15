@@ -3,21 +3,27 @@
 %define nginx_user nginx
 %define nginx_group nginx
 
+%define nginx_echo_version 0.58
+%define nginx_more_headers_version 0.29
+%define nginx_lua_version 0.10.2
+%define nginx_devel_kit_version 0.2.19
+%define nginx_rtmp_version 1.1.7
+
 Summary: nginx is a high performance web server
 Name: nginx
-Version: 1.7.10
-Release: 2%{?dist}
+Version: 1.8.1
+Release: 0%{?dist}
 Vendor: nginx inc.
 URL: http://nginx.org/
 
 Source0: http://nginx.org/download/%{name}-%{version}.tar.gz
 Source1: nginx-logrotate
 Source2: nginx.conf
-Source3: https://github.com/openresty/echo-nginx-module/archive/v0.57/echo-nginx-module-0.57.tar.gz
-Source4: https://github.com/openresty/headers-more-nginx-module/archive/v0.25/headers-more-nginx-module-0.25.tar.gz
-Source5: https://github.com/openresty/lua-nginx-module/archive/v0.9.15/lua-nginx-module-0.9.15.tar.gz
-Source6: https://github.com/simpl/ngx_devel_kit/archive/v0.2.19/ngx_devel_kit-0.2.19.tar.gz
-Source7: https://github.com/arut/nginx-rtmp-module/archive/v1.1.7/nginx-rtmp-module-1.1.7.tar.gz
+Source3: https://github.com/openresty/echo-nginx-module/archive/v%{nginx_echo_version}/echo-nginx-module-%{nginx_echo_version}.tar.gz
+Source4: https://github.com/openresty/headers-more-nginx-module/archive/v%{nginx_more_headers_version}/headers-more-nginx-module-%{nginx_more_headers_version}.tar.gz
+Source5: https://github.com/openresty/lua-nginx-module/archive/v%{nginx_lua_version}/lua-nginx-module-%{nginx_lua_version}.tar.gz
+Source6: https://github.com/simpl/ngx_devel_kit/archive/v%{nginx_devel_kit_version}/ngx_devel_kit-%{nginx_devel_kit_version}.tar.gz
+Source7: https://github.com/arut/nginx-rtmp-module/archive/v%{nginx_rtmp_version}/nginx-rtmp-module-%{nginx_rtmp_version}.tar.gz
 Source8: nginx-default.conf
 Source9: nginx.service
 
@@ -88,11 +94,11 @@ tar xf %{SOURCE7} -C $RPM_BUILD_DIR
     --with-ipv6 \
     --with-cc-opt="%{optflags} $(pcre-config --cflags)" \
     --with-debug \
-    --add-module=$RPM_BUILD_DIR/echo-nginx-module-0.57 \
-    --add-module=$RPM_BUILD_DIR/headers-more-nginx-module-0.25 \
-    --add-module=$RPM_BUILD_DIR/lua-nginx-module-0.9.15 \
-    --add-module=$RPM_BUILD_DIR/ngx_devel_kit-0.2.19 \
-    --add-module=$RPM_BUILD_DIR/nginx-rtmp-module-1.1.7
+    --add-module=$RPM_BUILD_DIR/echo-nginx-module-%{nginx_echo_version} \
+    --add-module=$RPM_BUILD_DIR/headers-more-nginx-module-%{nginx_more_headers_version} \
+    --add-module=$RPM_BUILD_DIR/lua-nginx-module-%{nginx_lua_version} \
+    --add-module=$RPM_BUILD_DIR/ngx_devel_kit-%{nginx_devel_kit_version} \
+    --add-module=$RPM_BUILD_DIR/nginx-rtmp-module-%{nginx_rtmp_version}
 
 make %{?_smp_mflags}
 
