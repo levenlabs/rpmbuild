@@ -1,10 +1,10 @@
-Packager: Brian Picciano <brian@grooveshark.com>
+Packager: Joe Admin <systems@getadmiral.com>
 
 Name: redis
-Version: 3.0.4
+Version: 3.2.3
 Release: 0%{dist}
 
-Summary: mediocregopher's redis 3.0.0-rc3 compilation
+Summary: levenlab's redis 3.2.3 compilation
 
 License: BSD
 
