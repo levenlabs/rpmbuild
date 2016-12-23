@@ -88,6 +88,7 @@ tar xf %{SOURCE7} -C $RPM_BUILD_DIR
     --with-http_stub_status_module \
     --with-http_spdy_module \
     --with-http_geoip_module \
+    --with-http_auth_request_module \
     --with-mail \
     --with-mail_ssl_module \
     --with-file-aio \
