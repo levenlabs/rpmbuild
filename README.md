@@ -9,6 +9,7 @@ vagrant up
 vagrant ssh
 # From inside the vagrant box
 cd rpmbuild
+spectool -g -R SPECS/whatever.spec
 rpmbuild -ba SPECS/whatever.spec
 ```
 
