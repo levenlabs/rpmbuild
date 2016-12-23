@@ -118,18 +118,19 @@ Vagrant.configure(2) do |config|
   #   chef.validation_client_name = "ORGNAME-validator"
 
   config.vm.provision "shell", inline: "yum groupinstall -y 'Development Tools'"
-  config.vm.provision "shell", inline: "yum install -y rpmdevtools"
-  config.vm.provision "shell", inline: "ln -s /vagrant /home/vagrant/rpmbuild"
+  config.vm.provision "shell", inline: "yum install -y rpmdevtools yum-utils"
   config.vm.provision "shell", inline: <<SCRIPT
+    if [ ! -e /home/vagrant/rpmbuild ]; then
+      ln -s /vagrant /home/vagrant/rpmbuild
+    fi
+SCRIPT
+  config.vm.provision "shell", privileged: false, inline: <<SCRIPT
     cd /home/vagrant/rpmbuild
     for spec in SPECS/*.spec; do spectool -R -g $spec; done
 SCRIPT
+  config.vm.provision "shell", inline: <<SCRIPT
+    cd /home/vagrant/rpmbuild
+    for spec in SPECS/*.spec; do yum-builddep -y $spec; done
+SCRIPT
 
-#  config.vm.provision "shell", inline: <<SCRIPT
-#    curl -sSL https://get.rvm.io | sudo bash -s stable
-#    . /etc/profile # rvm adds a profile.d script, we need it to be loaded
-#    rvm install 1.9.3
-#    rvm use --default 1.9.3
-#    gem install chef ruby-shadow --no-ri --no-rdoc
-#SCRIPT
 end

@@ -11,7 +11,7 @@
 
 Summary: nginx is a high performance web server
 Name: nginx
-Version: 1.8.1
+Version: 1.10.2
 Release: 0%{?dist}
 Vendor: nginx inc.
 URL: http://nginx.org/
@@ -86,7 +86,6 @@ tar xf %{SOURCE7} -C $RPM_BUILD_DIR
     --with-http_random_index_module \
     --with-http_secure_link_module \
     --with-http_stub_status_module \
-    --with-http_spdy_module \
     --with-http_geoip_module \
     --with-http_auth_request_module \
     --with-mail \
