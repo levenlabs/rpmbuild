@@ -8,15 +8,10 @@ vagrant up
 vagrant ssh
 # From inside the vagrant box
 cd rpmbuild
+spectool -g -R SPECS/whatever.spec
 rpmbuild -ba SPECS/whatever.spec
 ```
 
 `vagrant provision` should download all required source files and install all
 build dependencies. If any source versions change you'll have to re-run `vagrant
 provision`.
-
-## Nginx
-
-Compiling nginx is still a bit weird, you'll need to first compile and install
-the luajit rpm, then redo `vagrant provision`, then do the normal rpmbuild
-command.
