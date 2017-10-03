@@ -117,6 +117,7 @@ Vagrant.configure(2) do |config|
   #
   #   chef.validation_client_name = "ORGNAME-validator"
 
+  config.vm.provision "shell", inline: "yum update -y"
   config.vm.provision "shell", inline: "yum groupinstall -y 'Development Tools'"
   config.vm.provision "shell", inline: "yum install -y rpmdevtools yum-utils"
   config.vm.provision "shell", inline: <<SCRIPT

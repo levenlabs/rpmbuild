@@ -8,7 +8,7 @@
 Summary: nginx is a high performance web server
 Name: nginx
 Version: 1.12.1
-Release: 0%{?dist}.levenlabs
+Release: 1%{?dist}.levenlabs
 Vendor: nginx inc.
 URL: http://nginx.org/
 
