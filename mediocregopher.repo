@@ -1,6 +1,0 @@
-[mediocregopher]
-name=mediocregopher
-# https is enabled server-side, yum is using a really old version of nss or
-# or something because it doesn't accept any security protocols
-baseurl=http://mediocregopher.com/repo/el7/
-gpgcheck=0
