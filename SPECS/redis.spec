@@ -1,7 +1,7 @@
 Packager: Joe Admin <systems@getadmiral.com>
 
 Name: redis
-Version: 4.0.2
+Version: 4.0.6
 Release: 0%{dist}
 
 Summary: levenlab's redis 3.2.3 compilation
