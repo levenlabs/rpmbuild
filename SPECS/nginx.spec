@@ -3,11 +3,11 @@
 %define nginx_user nginx
 %define nginx_group nginx
 
-%define nginx_more_headers_version 0.32
+%define nginx_more_headers_version 0.33
 
 Summary: nginx is a high performance web server
 Name: nginx
-Version: 1.12.2
+Version: 1.16.1
 Release: 1%{?dist}.levenlabs
 Vendor: nginx inc.
 URL: http://nginx.org/
@@ -23,6 +23,7 @@ Source5: nginx.service
 License: 2-clause BSD-like license
 Group: System Environment/Daemons
 
+BuildRequires: gcc
 BuildRequires: zlib-devel
 BuildRequires: pcre-devel
 BuildRequires: openssl-devel
@@ -46,19 +47,21 @@ a mail proxy server
 tar xf %{SOURCE3} -C $RPM_BUILD_DIR
 
 %build
+nginx_ldopts="$RPM_LD_FLAGS -Wl,-E"
 ./configure \
     --prefix=%{_sysconfdir}/nginx \
     --sbin-path=%{_sbindir}/nginx \
+    --modules-path=%{_libdir}/nginx/modules \
     --conf-path=%{_sysconfdir}/nginx/nginx.conf \
     --error-log-path=%{_localstatedir}/log/nginx/error.log \
     --http-log-path=%{_localstatedir}/log/nginx/access.log \
-    --pid-path=%{_localstatedir}/run/nginx.pid \
-    --lock-path=%{_localstatedir}/run/nginx.lock \
     --http-client-body-temp-path=%{_localstatedir}/cache/nginx/client_temp \
     --http-proxy-temp-path=%{_localstatedir}/cache/nginx/proxy_temp \
     --http-fastcgi-temp-path=%{_localstatedir}/cache/nginx/fastcgi_temp \
     --http-uwsgi-temp-path=%{_localstatedir}/cache/nginx/uwsgi_temp \
     --http-scgi-temp-path=%{_localstatedir}/cache/nginx/scgi_temp \
+    --pid-path=%{_localstatedir}/run/nginx.pid \
+    --lock-path=%{_localstatedir}/run/nginx.lock \
     --user=%{nginx_user} \
     --group=%{nginx_group} \
     --with-cc-opt="%{optflags} $(pcre-config --cflags)" \
@@ -67,6 +70,7 @@ tar xf %{SOURCE3} -C $RPM_BUILD_DIR
     --with-http_addition_module \
     --with-http_auth_request_module \
     --with-http_dav_module \
+    --with-http_degradation_module \
     --with-http_flv_module \
     --with-http_geoip_module \
     --with-http_gunzip_module \
@@ -75,6 +79,7 @@ tar xf %{SOURCE3} -C $RPM_BUILD_DIR
     --with-http_random_index_module \
     --with-http_realip_module \
     --with-http_secure_link_module \
+    --with-http_slice_module \
     --with-http_ssl_module \
     --with-http_stub_status_module \
     --with-http_sub_module \
@@ -82,6 +87,11 @@ tar xf %{SOURCE3} -C $RPM_BUILD_DIR
     --with-ipv6 \
     --with-mail \
     --with-mail_ssl_module \
+    --with-pcre \
+    --with-pcre-jit \
+    --with-stream \
+    --with-stream_ssl_module \
+    --with-ld-opt="$nginx_ldopts" \
     --add-module=$RPM_BUILD_DIR/headers-more-nginx-module-%{nginx_more_headers_version} \
 
 make %{?_smp_mflags}
@@ -96,6 +106,8 @@ make %{?_smp_mflags}
 %{__mkdir} -p $RPM_BUILD_ROOT%{_localstatedir}/log/nginx
 %{__mkdir} -p $RPM_BUILD_ROOT%{_localstatedir}/run/nginx
 %{__mkdir} -p $RPM_BUILD_ROOT%{_localstatedir}/cache/nginx
+%{__mkdir} -p $RPM_BUILD_ROOT%{_datadir}/nginx/modules
+%{__mkdir} -p $RPM_BUILD_ROOT%{_libdir}/nginx/modules
 
 %{__mkdir} -p $RPM_BUILD_ROOT%{_sysconfdir}/nginx/conf.d
 %{__rm} $RPM_BUILD_ROOT%{_sysconfdir}/nginx/nginx.conf
