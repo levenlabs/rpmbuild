@@ -3,8 +3,12 @@
 %define nginx_user nginx
 %define nginx_group nginx
 
-%define main_version 1.16.1
-%define main_release 2%{?dist}.levenlabs
+%define main_version 1.18.0
+%define main_release 1%{?dist}.levenlabs
+
+%define openssl_version 1.1.1g
+%define pcre_version 8.44
+%define zlib_version 1.2.11
 
 %define nginx_more_headers_version 0.33
 %define WITH_CC_OPT $(echo %{optflags} $(pcre-config --cflags)) -fPIC
@@ -25,14 +29,14 @@ Source4: nginx.conf
 Source5: nginx-default.conf
 Source8: nginx.service
 Source90: https://github.com/openresty/headers-more-nginx-module/archive/v%{nginx_more_headers_version}/headers-more-nginx-module-%{nginx_more_headers_version}.tar.gz
-Source91: https://www.openssl.org/source/openssl-1.1.1d.tar.gz
-Source92: https://ftp.pcre.org/pub/pcre/pcre-8.43.tar.gz
-Source93: https://www.zlib.net/zlib-1.2.11.tar.gz
-Source94: https://github.com/vozlt/nginx-module-vts/archive/master.tar.gz
+Source100: https://www.openssl.org/source/openssl-%{openssl_version}.tar.gz
+Source101: https://ftp.pcre.org/pub/pcre/pcre-%{pcre_version}.tar.gz
+Source102: https://www.zlib.net/zlib-%{zlib_version}.tar.gz
 
 License: 2-clause BSD-like license
 Group: System Environment/Daemons
 
+BuildRequires: git
 BuildRequires: gcc
 BuildRequires: perl
 BuildRequires: GeoIP-devel
@@ -48,10 +52,16 @@ nginx [engine x] is an HTTP and reverse proxy server
 %prep
 %setup -q
 tar xf %{SOURCE90} -C $RPM_BUILD_DIR
-tar xf %{SOURCE91} -C $RPM_BUILD_DIR
-tar xf %{SOURCE92} -C $RPM_BUILD_DIR
-tar xf %{SOURCE93} -C $RPM_BUILD_DIR
-tar xf %{SOURCE94} -C $RPM_BUILD_DIR
+
+git clone https://github.com/vozlt/nginx-module-vts $RPM_BUILD_DIR/nginx-module-vts
+cd $RPM_BUILD_DIR/nginx-module-vts && git submodule update --init
+
+git clone https://github.com/google/ngx_brotli $RPM_BUILD_DIR/ngx_brotli
+cd $RPM_BUILD_DIR/ngx_brotli && git submodule update --init
+
+mkdir $RPM_BUILD_DIR/openssl && tar zxf %{SOURCE100} -C $RPM_BUILD_DIR/openssl --strip-components 1
+mkdir $RPM_BUILD_DIR/pcre && tar zxf %{SOURCE101} -C $RPM_BUILD_DIR/pcre --strip-components 1
+mkdir $RPM_BUILD_DIR/zlib && tar zxf %{SOURCE102} -C $RPM_BUILD_DIR/zlib --strip-components 1
 
 %build
 ./configure \
@@ -72,6 +82,7 @@ tar xf %{SOURCE94} -C $RPM_BUILD_DIR
     --group=%{nginx_group} \
     --with-debug \
     --with-file-aio \
+    --with-threads \
     --with-http_addition_module \
     --with-http_auth_request_module \
     --with-http_dav_module \
@@ -95,15 +106,17 @@ tar xf %{SOURCE94} -C $RPM_BUILD_DIR
     --with-pcre-jit \
     --with-stream \
     --with-stream_ssl_module \
-    --with-openssl=$RPM_BUILD_DIR/openssl-1.1.1d \
-    --with-pcre=$RPM_BUILD_DIR/pcre-8.43 \
+    --with-openssl=$RPM_BUILD_DIR/openssl --with-openssl-opt=enable-tls1_3 \
+    --with-stream_ssl_preread_module \
+    --with-pcre=$RPM_BUILD_DIR/pcre \
     --with-pcre-opt='-g -Ofast -fPIC -m64 -march=native -fstack-protector-strong -D_FORTIFY_SOURCE=2' \
-    --with-zlib=$RPM_BUILD_DIR/zlib-1.2.11 \
+    --with-zlib=$RPM_BUILD_DIR/zlib \
     --with-zlib-opt='-g -Ofast -fPIC -m64 -march=native -fstack-protector-strong -D_FORTIFY_SOURCE=2' \
-    --add-module=$RPM_BUILD_DIR/nginx-module-vts-master \
+    --add-module=$RPM_BUILD_DIR/nginx-module-vts \
     --with-cc-opt="%{WITH_CC_OPT}" \
     --with-ld-opt="%{WITH_LD_OPT}" \
     --add-module=$RPM_BUILD_DIR/headers-more-nginx-module-%{nginx_more_headers_version} \
+    --add-module=$RPM_BUILD_DIR/ngx_brotli \
 
 make %{?_smp_mflags}
 
