@@ -1,16 +1,15 @@
-#
 %define nginx_home %{_localstatedir}/cache/nginx
 %define nginx_user nginx
 %define nginx_group nginx
 
 %define main_version 1.18.0
-%define main_release 1%{?dist}.levenlabs
+%define main_release 2%{?dist}.levenlabs
 
-%define openssl_version 1.1.1g
+%define openssl_version 1.1.1k
 %define pcre_version 8.44
 %define zlib_version 1.2.11
-
 %define nginx_more_headers_version 0.33
+
 %define WITH_CC_OPT $(echo %{optflags} $(pcre-config --cflags)) -fPIC
 %define WITH_LD_OPT -Wl,-z,relro -Wl,-z,now -pie
 %define bdir %{_builddir}/%{name}-%{main_version}
@@ -51,17 +50,17 @@ nginx [engine x] is an HTTP and reverse proxy server
 
 %prep
 %setup -q
-tar xf %{SOURCE90} -C $RPM_BUILD_DIR
+tar xf %{SOURCE90} -C %{_builddir}
 
-git clone https://github.com/vozlt/nginx-module-vts $RPM_BUILD_DIR/nginx-module-vts
-cd $RPM_BUILD_DIR/nginx-module-vts && git submodule update --init
+git clone https://github.com/vozlt/nginx-module-vts %{_builddir}/nginx-module-vts
+cd %{_builddir}/nginx-module-vts && git submodule update --init
 
-git clone https://github.com/google/ngx_brotli $RPM_BUILD_DIR/ngx_brotli
-cd $RPM_BUILD_DIR/ngx_brotli && git submodule update --init
+git clone https://github.com/google/ngx_brotli %{_builddir}/ngx_brotli
+cd %{_builddir}/ngx_brotli && git submodule update --init
 
-mkdir $RPM_BUILD_DIR/openssl && tar zxf %{SOURCE100} -C $RPM_BUILD_DIR/openssl --strip-components 1
-mkdir $RPM_BUILD_DIR/pcre && tar zxf %{SOURCE101} -C $RPM_BUILD_DIR/pcre --strip-components 1
-mkdir $RPM_BUILD_DIR/zlib && tar zxf %{SOURCE102} -C $RPM_BUILD_DIR/zlib --strip-components 1
+mkdir %{_builddir}/openssl && tar zxf %{SOURCE100} -C %{_builddir}/openssl --strip-components 1
+mkdir %{_builddir}/pcre && tar zxf %{SOURCE101} -C %{_builddir}/pcre --strip-components 1
+mkdir %{_builddir}/zlib && tar zxf %{SOURCE102} -C %{_builddir}/zlib --strip-components 1
 
 %build
 ./configure \
@@ -106,71 +105,71 @@ mkdir $RPM_BUILD_DIR/zlib && tar zxf %{SOURCE102} -C $RPM_BUILD_DIR/zlib --strip
     --with-pcre-jit \
     --with-stream \
     --with-stream_ssl_module \
-    --with-openssl=$RPM_BUILD_DIR/openssl --with-openssl-opt=enable-tls1_3 \
+    --with-openssl=%{_builddir}/openssl --with-openssl-opt=enable-tls1_3 \
     --with-stream_ssl_preread_module \
-    --with-pcre=$RPM_BUILD_DIR/pcre \
+    --with-pcre=%{_builddir}/pcre \
     --with-pcre-opt='-g -Ofast -fPIC -m64 -march=native -fstack-protector-strong -D_FORTIFY_SOURCE=2' \
-    --with-zlib=$RPM_BUILD_DIR/zlib \
+    --with-zlib=%{_builddir}/zlib \
     --with-zlib-opt='-g -Ofast -fPIC -m64 -march=native -fstack-protector-strong -D_FORTIFY_SOURCE=2' \
-    --add-module=$RPM_BUILD_DIR/nginx-module-vts \
+    --add-module=%{_builddir}/nginx-module-vts \
     --with-cc-opt="%{WITH_CC_OPT}" \
     --with-ld-opt="%{WITH_LD_OPT}" \
-    --add-module=$RPM_BUILD_DIR/headers-more-nginx-module-%{nginx_more_headers_version} \
-    --add-module=$RPM_BUILD_DIR/ngx_brotli \
+    --add-module=%{_builddir}/headers-more-nginx-module-%{nginx_more_headers_version} \
+    --add-module=%{_builddir}/ngx_brotli \
 
 make %{?_smp_mflags}
 
 %install
-%{__rm} -rf $RPM_BUILD_ROOT
-%{__make} DESTDIR=$RPM_BUILD_ROOT install
+%{__rm} -rf %{buildroot}
+%{__make} DESTDIR=%{buildroot} install
 
-%{__mkdir} -p $RPM_BUILD_ROOT%{_datadir}/nginx
-%{__mv} $RPM_BUILD_ROOT%{_sysconfdir}/nginx/html $RPM_BUILD_ROOT%{_datadir}/nginx/
+%{__mkdir} -p %{buildroot}%{_datadir}/nginx
+%{__mv} %{buildroot}%{_sysconfdir}/nginx/html %{buildroot}%{_datadir}/nginx/
 
-%{__rm} -f $RPM_BUILD_ROOT%{_sysconfdir}/nginx/*.default
-%{__rm} -f $RPM_BUILD_ROOT%{_sysconfdir}/nginx/fastcgi.conf
+%{__rm} -f %{buildroot}%{_sysconfdir}/nginx/*.default
+%{__rm} -f %{buildroot}%{_sysconfdir}/nginx/fastcgi.conf
 
-%{__mkdir} -p $RPM_BUILD_ROOT%{_localstatedir}/log/nginx
-%{__mkdir} -p $RPM_BUILD_ROOT%{_localstatedir}/run/nginx
-%{__mkdir} -p $RPM_BUILD_ROOT%{_localstatedir}/cache/nginx
-%{__mkdir} -p $RPM_BUILD_ROOT%{_datadir}/nginx/modules
-cd $RPM_BUILD_ROOT%{_sysconfdir}/nginx && \
+%{__mkdir} -p %{buildroot}%{_localstatedir}/log/nginx
+%{__mkdir} -p %{buildroot}%{_localstatedir}/run/nginx
+%{__mkdir} -p %{buildroot}%{_localstatedir}/cache/nginx
+%{__mkdir} -p %{buildroot}%{_datadir}/nginx/modules
+cd %{buildroot}%{_sysconfdir}/nginx && \
     %{__ln_s} ../..%{_libdir}/nginx/modules modules && cd -
 
-%{__mkdir} -p $RPM_BUILD_ROOT%{_datadir}/doc/%{name}-%{main_version}
+%{__mkdir} -p %{buildroot}%{_datadir}/doc/%{name}-%{main_version}
 %{__install} -m 644 -p LICENSE \
-    $RPM_BUILD_ROOT%{_datadir}/doc/%{name}-%{main_version}/COPYRIGHT
+    %{buildroot}%{_datadir}/doc/%{name}-%{main_version}/COPYRIGHT
 
-%{__mkdir} -p $RPM_BUILD_ROOT%{_sysconfdir}/nginx/conf.d
-%{__rm} $RPM_BUILD_ROOT%{_sysconfdir}/nginx/nginx.conf
+%{__mkdir} -p %{buildroot}%{_sysconfdir}/nginx/conf.d
+%{__rm} %{buildroot}%{_sysconfdir}/nginx/nginx.conf
 %{__install} -m 644 -p %{SOURCE4} \
-    $RPM_BUILD_ROOT%{_sysconfdir}/nginx/nginx.conf
+    %{buildroot}%{_sysconfdir}/nginx/nginx.conf
 # we don't need default.conf
 # %{__install} -m 644 -p %{SOURCE5} \
-#    $RPM_BUILD_ROOT%{_sysconfdir}/nginx/conf.d/default.conf
+#    %{buildroot}%{_sysconfdir}/nginx/conf.d/default.conf
 
-%{__mkdir} -p $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig
+%{__mkdir} -p %{buildroot}%{_sysconfdir}/sysconfig
 %{__install} -m 644 -p %{SOURCE3} \
-    $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig/nginx
+    %{buildroot}%{_sysconfdir}/sysconfig/nginx
 
 %{__install} -p -D -m 0644 %{bdir}/objs/nginx.8 \
-    $RPM_BUILD_ROOT%{_mandir}/man8/nginx.8
+    %{buildroot}%{_mandir}/man8/nginx.8
 
 # install log rotation stuff
-%{__mkdir} -p $RPM_BUILD_ROOT%{_sysconfdir}/logrotate.d
+%{__mkdir} -p %{buildroot}%{_sysconfdir}/logrotate.d
 %{__install} -m 644 -p %{SOURCE1} \
-   $RPM_BUILD_ROOT%{_sysconfdir}/logrotate.d/nginx
+   %{buildroot}%{_sysconfdir}/logrotate.d/nginx
 
 # install systemd-specific files
-%{__mkdir} -p $RPM_BUILD_ROOT%{_unitdir}
+%{__mkdir} -p %{buildroot}%{_unitdir}
 %{__install} -m644 %SOURCE8 \
-    $RPM_BUILD_ROOT%{_unitdir}/nginx.service
+    %{buildroot}%{_unitdir}/nginx.service
 
 %check
-%{__rm} -rf $RPM_BUILD_ROOT/usr/src
+%{__rm} -rf %{buildroot}/usr/src
 
 %clean
-%{__rm} -rf $RPM_BUILD_ROOT
+%{__rm} -rf %{buildroot}
 
 %files
 %defattr(-,root,root)
